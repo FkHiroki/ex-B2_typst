@@ -1,88 +1,73 @@
-// タイトル
 
-#align(center, text(18pt, "量子コンピューティング アニーリング レポート")) \
+= 1. 目的
 
-#align(right, text(12pt, "62217149 福原博樹"))
+  レーザ光源とスリットを用いて、光の干渉、回折現象を観察する。そしてその結果を理論値と比較することで、現象の理解を図る。また、数値計算ソフトウェアOctaveを用いて様々なスリットにおける光の干渉、回折現象をシミュレーションする。
 
-// = [A1-1]
+= 2. 実験原理
 
-//   $ E(s_1,s_2) = -J_(1,2) s_1 s_2 - h_1 s_1 - h_2 s_2, space s_i in {-1, 1} \
-//     E_("QUBO") = a_1 x_1 + a_2 x_2 + b_(1,2) x_1 x_2 + "const", space x in {0, 1} \
-//     x_i = (1 - s_i) / 2, space <=> space s_i = 1 - 2 x_i \ $
-//   $ E(x_1,x_2) &= -J_(1,2) (1 - 2 x_1) (1 - 2 x_2) - h_1 (1 - 2 x_1) - h_2 (1 - 2 x_2) \
-//     &= 2(J_(1,2) + h_1) x_1 + 2(J_(1,2) + h_2) x_2 - 4 J_(1,2) x_1 x_2 + "const" \
-//     therefore a_1 &= 2(J_(1,2) + h_1), space a_2 = 2(J_(1,2) + h_2), space b_(1,2) = -4 J_(1,2) \ $
-
-= [A2-2] 問題: 数独
-
-  組合せ最適化問題として「数独」を選択した。アニーリングマシンを用いて数独を解くためのQUBO定式化について考える。
-  数独の具体例として、2×2のブロックに区切られた4×4のマス目の数独を考える。各マス目には1から4までの数字が入る。この問題は、以下で考える制約条件を全て満たすものが解となるため、目的関数はない。まず、インデックス$i, j, k$がそれぞれ、マス目の行、列、数字を表すとする（各インデックスは$0~3$までとする）。この時、$x_(i,j,k)$は$0,1$のバイナリ変数で、マス目$(i,j)$に数字$k$が入る場合に$x_(i,j,k) = 1$となる。
-  各マス目には1つの数字が入るため、次の制約が成り立つ。
-
-  $ sum_(k=0)^3 x_(i,j,k) = 1, space forall i, j \ $
-
-  次に、各列、行には同じ数字が入らないようにするための制約を考える。例えば、マス目$(0,0)$に数字$1$が入る場合、その列、行には数字$1$が入らないようにする必要がある。この制約は以下のように表される。
-
-  $ sum_(i=0)^3 x_(i,j,k) = 1, space forall j, k \ 
-    sum_(j=0)^3 x_(i,j,k) = 1, space forall i, k \ $
+  光の干渉、回折現象は、光の波動性によって生じる現象である。波において、2つ以上の波が一点で重なる時、その点での光の振幅は、個々の波が足し合わされた振幅になる現象が干渉である。ただし光が干渉するには、2つの波の波長が等しく、位相差が一定に保たれており、少なくともある時間は振幅一定の合成振動をする場合にのみ干渉するという特徴がある。それに対し、障害物等がある際に、波が直進せずにその障害物の幾何学的影の部分に回り込むような動きをする現象が回折である。
   
-  最後に、各ブロックには同じ数字が入らないようにするための制約は以下のように表される。
+  次に@fig:theory のような状況を考える。光源Qからでた光で、半径$1$のところの光を$A = A_0 sin omega t$とすると、光源から距離$a$離れた波面Eでは、
 
-  $ sum_(i,j in 2×2"ブロック") x_(i,j,k) = 1, space forall k \ $
+  $ A = A_0 / a sin(omega t - (2 pi) / lambda a) $
 
-  上記のように、全ての制約条件はOne-hot表現で表すことができた。これらの制約条件を満たすようなQUBO定式化を行うことで、数独を解くことができる。
-  一般の問題規模での数独を解くためには、上記の制約条件を拡張すればよい。例えば、$n×n$のマス目に数字$1$から$n$までが入る数独の場合、インデックスは$0 space ~ space n-1$とするだけでよい。
+  となる。次に、PM間の距離を$r$とすると、Pから出た光のMにおける振幅は、
 
-= [A2-3]
+  $ A = alpha / r A_0 / a sin[omega t - (2 pi) / lambda ( a + r )] $
 
-  [A2-2]で求めた制約条件を入力して、数独をアニーリングマシンに解かせてみる。
-  今回アニーリングマシンに以下の数独の問題を解かせる。
+  ここで、$alpha$は光の方向によって変わるが、ここでは、$alpha = 1$とする。そして、干渉を考えた際の$M$における振幅は、
+
+  $ A(M) = integral_E A_0 / (a r) sin[omega t - (2 pi) / lambda (a + r)] d e $
+
+  となる。スリットの幅が小さいことを考えると、$A_0/(a r) tilde.eq A_0 / (a b)$となる。また、振幅の比のみを今後考えるために、$A_0/a b = 1$とする。ここで、@fig:theory の状況を2次元として考える。P、Mの座標をそれぞれ$(xi, -b + zeta)$、$(x, 0)$とすると、
+
+  $ r = sqrt((x - xi)^2 + (b - zeta)^2) $
+
+  となり、波面E上の座標の式は、
+
+  $ xi^2 + (a + zeta)^2 = a^2 $
+
+  とすると、最終的に$r$は、
+
+  $ r = sqrt(x^2 + b^2 - 2(a + b)zeta - 2 x xi) $ <eq:r>
+
+  となる。ここで、$zeta$が十分小さいとき、$(5)$式より$zeta = - xi^2 / 2a$となるため、これを踏まえて<eq:r> をテイラー展開すると、
+
+  $ r = b(1 + x^2 / (2 b^2)) - ((x xi)/b - (a + b) / (2 a b) xi^2) + dots = overline(epsilon) + epsilon(xi) $ <eq:r2>
+
+  となる。これを用いると、$A(M)$は、
+
+  $ A(M) &= integral_E sin[omega t - (2 pi) / lambda (a + overline(epsilon) + epsilon(xi))] d e \
+  &= C dot sin[omega t - (2 pi) / lambda (a + overline(epsilon))] + S dot cos[omega t - (2 pi) / lambda (a + overline(epsilon))] \
+
+  C &= integral_E cos (2 pi)/lambda ((x xi) / b - (a + b) / (2 a b) xi^2) d e \
+  S &= integral_E sin (2 pi)/lambda ((x xi) / b - (a + b) / (2 a b) xi^2) d e 
+  $ <eq:AM>
+
+  となり、光強度は$|A(M)|^2 = C^2 + S^2$となる
+  次に、@fig:theory2 のような状況を考える。この場合は、E'面の積分を考えれば良い。PをE'上にとった時、波面E'の式は$xi^2 + (b-zeta)^2 = b^2$となり、PM間の距離を$r'$とすると、$r' = sqrt((x - xi)^2 + (b - zeta)^2)$となるため、
+
+  $
+  a + r &= a + b + r - b =  a + b + sqrt((x - xi)^2 + (b - zeta)^2) - b \
+   &tilde.eq (a + b + x^2/(2b)) - (x xi) / b
+  $
+
+  となる。$epsilon = (2 pi)/lambda dot (x xi) / b = k x xi$と置けるので、<eq:AM> は、
+
+  $
+  C = integral_E cos k x xi d e \
+  S = integral_E sin k x xi d e \
+  C + i S = integral_E exp(i k x xi) d e
+  $
+
+  となる。よって、$(10)$と、$|A(M)|^2 = C^2 + S^2$より、回折像が開口部Sのフーリエ変換になることがわかる。
 
   #figure(
-  image("../figs/sudoku_hardest.png", width: 50%),
-  caption: "引用元: https://www.sentohsharyoga.com/ja/puzzle/blog/entry/sudoku_most_difficult",
-  ) 
-
-  制約条件をコードに落とし込むと以下のようになる。
-
-  ```python
-  from amplify import one_hot
-  from amplify import sum as amplify_sum
-
-  number_constraints = one_hot(q, axis=2) # 各マスには1つの数字が入る
-  row_constraints = one_hot(q, axis=1) # 各行には1から9が1度ずつ
-  column_constraints = one_hot(q, axis=0) # 各列には1から9が1度ずつ
-  # 各ブロックには1から9が1度ずつ
-  block_constraints = amplify_sum(
-      one_hot(amplify_sum([q[i+m//3, j+m%3, k] for m in range(9)]))
-      for i in range(0, 9, 3)
-      for j in range(0, 9, 3)
-      for k in range(9)
-  # 全ての制約条件の和を取る
-  constraints = number_constraints + row_constraints + column_constraints + block_constraints
-  )
-
-  ```
-  そして、この制約条件を以下のようにアニーリングマシンに入力して解を求める。
-
-  ```python
-  from amplify import solve, FixstarsClient
-  from datetime import timedelta
-
-  client = FixstarsClient()
-  client.token = "AE/6BC8Bfo4ZNBBvU10lhggLyPWQm2k1ZQB"
-  client.parameters.timeout = timedelta(milliseconds=1000) # タイムアウト1秒
-
-  result = solve(constraints, client=client)
-  ```
-
-  そして、以下に計算結果を盤面に表示させたものと、計算にかかった時間を示す。
+  image("/figs/theory_fourie.png", width: 90%),
+  caption: [光源Qの回折像(参照: )]
+  ) <fig:theory>
 
   #figure(
-  image("../figs/sudoku_result.png", width: 50%),
-  ) 
-
-  このように、$63 "ms"$で数独の問題を解くことができた。現在の古典コンピュータでは同じ問題を解く方法がいくつか見つかっている。例えば、Rust + WebAssemblyを用いて、今回のアニーリングマシンでの解法よりも高速に解くことができるようだ（参考：https://qiita.com/yuto-ono/items/3178d29ce5fc4e9eba02）。しかし、制約条件を整数・バイナリ変数で表現し、アニーリングマシンに入力することで、数独を解くことができることが確認できた。
-
-
-
+  image("/figs/theory_fourie2.png", width: 90%),
+  caption: [光源Qのフラウンホーファー回折像(参照: )]
+  ) <fig:theory2>

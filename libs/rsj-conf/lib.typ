@@ -30,7 +30,7 @@
   show par: set block(spacing: 0.55em)
 
   // Configure equation numbering and spacing.
-  // set math.equation(numbering: "(1)")
+  set math.equation(numbering: "(1)")
   show math.equation: set block(spacing: 1em)
 
   // Configure appearance of equation references
@@ -87,22 +87,22 @@
       #v(20pt, weak: true)
     ]
   })
-
+  // caption
   show figure.where(kind: table): it => [
     #v(30pt)
     #it
     #v(30pt)
   ]
   show figure.where(kind: table): set figure(supplement: [表])
-  show figure.where(kind: table): set figure.caption(position: top, separator: [： ])
+  show figure.where(kind: table): set figure.caption(position: top, separator: [: ])
 
   show figure.where(kind: image): it => [
     #v(30pt)
     #it
     #v(30pt)
   ]
-  show figure.where(kind: image): set figure(supplement:none)
-  show figure.where(kind: image): set figure.caption(position: bottom)
+  show figure.where(kind: image): set figure(supplement: [図])
+  show figure.where(kind: image): set figure.caption(position: bottom, separator: [: ])
 
   // Display the paper's title.
   // align(center, text(18pt, title, weight: "bold", font: gothic))

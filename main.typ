@@ -6,7 +6,7 @@
   // title: [Typst を使った国内学会論文の書き方 \ - 国内学会予稿集に似せたフォーマットの作成 - ], 
   // authors: [◯ 著者姓1 著者名1，著者姓2 著者名2(○○○大学)，著者姓3 著者名3 (□□□株式会社)],
   // abstract: [#lorem(80)],
-  // bibliography: bibliography("refs.bib", full: false)
+  bibliography: bibliography("refs.bib", full: false)
 )
 
 // ソースコードブロックを表示するためのパッケージ
@@ -18,5 +18,5 @@
 
 
 #include "sections/section1.typ"
-// #include "sections/section2.typ"
-#include "sections/section3.typ"
+#include "sections/section2.typ"
+// #include "sections/section3.typ"
