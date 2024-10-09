@@ -1,4 +1,3 @@
-
 = 1. 目的
 
   レーザ光源とスリットを用いて、光の干渉、回折現象を観察する。そしてその結果を理論値と比較することで、現象の理解を図る。また、数値計算ソフトウェアOctaveを用いて様々なスリットにおける光の干渉、回折現象をシミュレーションする。
@@ -31,7 +30,7 @@
 
   $ r = sqrt(x^2 + b^2 - 2(a + b)zeta - 2 x xi) $ <eq:r>
 
-  となる。ここで、$zeta$が十分小さいとき、$(5)$式より$zeta = - xi^2 / 2a$となるため、これを踏まえて<eq:r> をテイラー展開すると、
+  となる。ここで、$zeta$が十分小さいとき、$(5)$式より$zeta = - xi^2 / 2a$となるため、これを踏まえて式@eq:r をテイラー展開すると、
 
   $ r = b(1 + x^2 / (2 b^2)) - ((x xi)/b - (a + b) / (2 a b) xi^2) + dots = overline(epsilon) + epsilon(xi) $ <eq:r2>
 
@@ -52,22 +51,22 @@
    &tilde.eq (a + b + x^2/(2b)) - (x xi) / b
   $
 
-  となる。$epsilon = (2 pi)/lambda dot (x xi) / b = k x xi$と置けるので、<eq:AM> は、
+  となる。$epsilon = (2 pi)/lambda dot (x xi) / b = k x xi$と置けるので、式@eq:AM は、
 
   $
   C = integral_E cos k x xi d e \
   S = integral_E sin k x xi d e \
   C + i S = integral_E exp(i k x xi) d e
-  $
+  $ <eq:AM2>
 
-  となる。よって、$(10)$と、$|A(M)|^2 = C^2 + S^2$より、回折像が開口部Sのフーリエ変換になることがわかる。
+  となる。よって、式@eq:AM2 と、$|A(M)|^2 = C^2 + S^2$より、回折像が開口部Sのフーリエ変換になることがわかる。
 
   #figure(
   image("/figs/theory_fourie.png", width: 90%),
-  caption: [光源Qの回折像(参照: )]
+  caption: [光源Qの回折像(参照: @text2024b2)]
   ) <fig:theory>
 
   #figure(
   image("/figs/theory_fourie2.png", width: 90%),
-  caption: [光源Qのフラウンホーファー回折像(参照: )]
+  caption: [光源Qのフラウンホーファー回折像(参照: @text2024b2)]
   ) <fig:theory2>
